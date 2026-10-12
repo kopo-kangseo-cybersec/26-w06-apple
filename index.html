@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🍎 사과 수확 게임</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <main class="container">
+        <h1>🍎 사과 수확 게임</h1>
+        <p class="description">
+            상하좌우로 연결된 사과를 드래그해 합이 10이 되게 하세요!
+        </p>
+
+        <section class="stats">
+            <div class="stat">
+                <span>남은 시간</span>
+                <strong id="timer">01:00</strong>
+            </div>
+
+            <div class="stat">
+                <span>현재 점수</span>
+                <strong id="score">0</strong>
+            </div>
+
+            <div class="stat">
+                <span>최고 점수</span>
+                <strong id="bestScore">0</strong>
+            </div>
+        </section>
+
+        <div class="progress">
+            <div id="timeBar"></div>
+        </div>
+
+        <div id="grid" class="grid"></div>
+
+        <p id="message" aria-live="polite">
+            게임 시작 버튼을 누르세요!
+        </p>
+
+        <div class="controls">
+            <button id="startButton" class="start-button">
+                게임 시작
+            </button>
+
+            <button id="endButton" class="end-button" disabled>
+                게임 종료
+            </button>
+        </div>
+    </main>
+
+    <!-- 최고 점수 갱신 시 콘페티를 그리는 캔버스 -->
+    <canvas id="confettiCanvas" aria-hidden="true"></canvas>
+</body>
+</html>

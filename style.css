@@ -1,0 +1,285 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 25px 12px;
+    min-height: 100vh;
+    background: #fff8ee;
+    color: #462c26;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    margin-bottom: 8px;
+    color: #d63c35;
+    font-size: 30px;
+}
+
+.description {
+    color: #82655a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin: 24px 0 14px;
+}
+
+.stat {
+    padding: 12px 4px;
+    background: #fff;
+    border: 2px solid #f2dfcc;
+    border-radius: 12px;
+}
+
+.stat span {
+    display: block;
+    margin-bottom: 7px;
+    color: #937568;
+    font-size: 12px;
+}
+
+.stat strong {
+    font-size: 21px;
+}
+
+#timer {
+    color: #e34b42;
+}
+
+#score {
+    color: #319452;
+}
+
+#bestScore {
+    color: #d28a26;
+}
+
+.progress {
+    height: 7px;
+    margin-bottom: 16px;
+    overflow: hidden;
+    background: #f0dfcd;
+    border-radius: 10px;
+}
+
+#timeBar {
+    width: 100%;
+    height: 100%;
+    background: #55b96b;
+    transition: width 0.3s linear;
+}
+
+#timeBar.urgent {
+    background: #e34b42;
+}
+
+/* 6x6 사과 격자 */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 7px;
+    padding: 10px;
+    background: #f4e2ca;
+    border: 2px solid #e8c8a8;
+    border-radius: 16px;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+}
+
+.cell {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    min-width: 0;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: #fffaf4;
+    cursor: pointer;
+    touch-action: none;
+    transition:
+        background 0.12s ease,
+        transform 0.12s ease,
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+}
+
+.apple {
+    font-size: clamp(25px, 7vw, 38px);
+    line-height: 1;
+    pointer-events: none;
+}
+
+.value {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 23px;
+    height: 23px;
+    transform: translate(-50%, -40%);
+    border: 1px solid rgba(255, 255, 255, 0.8);
+    border-radius: 50%;
+    background: rgba(111, 25, 20, 0.85);
+    color: white;
+    font-size: 13px;
+    font-weight: bold;
+    pointer-events: none;
+}
+
+/* 드래그 중인 사과 하이라이트 */
+.cell.selected {
+    z-index: 2;
+    transform: scale(0.92);
+    border-color: #f0a91d;
+    background: #ffe18a;
+    box-shadow: 0 0 0 2px #fff3c5;
+}
+
+.cell.selected .apple {
+    transform: scale(1.08);
+}
+
+/* 수확한 사과 사라지는 효과 */
+.cell.clearing {
+    animation: disappear 0.18s ease forwards;
+    pointer-events: none;
+}
+
+@keyframes disappear {
+    to {
+        opacity: 0;
+        transform: scale(0.4) rotate(12deg);
+    }
+}
+
+/* 위쪽 사과가 아래로 떨어지는 효과 */
+.cell.falling {
+    transition:
+        transform 380ms cubic-bezier(0.22, 0.75, 0.2, 1) !important;
+}
+
+/* 새 사과가 위에서 떨어지는 효과 */
+.cell.falling-new {
+    transition:
+        transform 380ms cubic-bezier(0.22, 0.75, 0.2, 1),
+        opacity 250ms ease !important;
+}
+
+#message {
+    min-height: 42px;
+    margin: 16px 0 12px;
+    color: #73594d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+#message.warning {
+    color: #d73530;
+    font-weight: bold;
+}
+
+/* 시작 및 종료 버튼 */
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.controls button {
+    min-width: 0;
+    padding: 14px 8px;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition:
+        background 0.15s,
+        transform 0.1s;
+}
+
+.controls button:active:not(:disabled) {
+    transform: scale(0.97);
+}
+
+.start-button {
+    background: #df4840;
+    color: white;
+}
+
+.start-button:hover {
+    background: #c93630;
+}
+
+.end-button {
+    background: #493b38;
+    color: white;
+}
+
+.end-button:hover:not(:disabled) {
+    background: #302522;
+}
+
+.end-button:disabled {
+    background: #d5c8c0;
+    color: #8c7d75;
+    cursor: not-allowed;
+}
+
+/* 콘페티 캔버스 */
+#confettiCanvas {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+}
+
+@media (max-width: 360px) {
+    .grid {
+        gap: 4px;
+        padding: 6px;
+    }
+
+    .cell {
+        border-radius: 8px;
+    }
+
+    .value {
+        width: 19px;
+        height: 19px;
+        font-size: 11px;
+    }
+
+    h1 {
+        font-size: 25px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .cell,
+    #timeBar,
+    .controls button {
+        transition-duration: 0.01ms;
+    }
+}
