@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f6f8ed">
+  <title>사과 합 10 게임</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="game">
+    <p class="eyebrow">APPLE · MAKE TEN</p>
+    <h1>사과 합 10</h1>
+    <p class="subtitle">상하좌우로 이어진 사과를 드래그해 보세요.<br>합이 딱 10이 되면 수확할 수 있어요!</p>
+
+    <section class="stats" aria-label="게임 점수와 시간">
+      <div class="stat">
+        <span class="stat-label">내 점수</span>
+        <span class="stat-value" id="score">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">남은 시간</span>
+        <span class="stat-value" id="timer">01:00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">최고 점수</span>
+        <span class="stat-value" id="best-score">0</span>
+      </div>
+    </section>
+
+    <div class="board-wrap">
+      <div class="board" id="board" role="group" aria-label="숫자 8 곱하기 8 게임판"></div>
+      <div class="board-message" id="board-message">
+        게임 시작을 누르고<br>사과를 수확해 보세요!
+      </div>
+    </div>
+    <p class="status" id="status" role="status" aria-live="polite">시작 버튼을 누르면 1분 카운트다운이 시작돼요.</p>
+    <div class="action-row">
+      <button class="start-button" id="start-button" type="button">게임 시작</button>
+    </div>
+    <p class="footnote">상하좌우로 이어진 칸만 선택할 수 있어요 · 한 칸당 1점</p>
+  </main>
+  <div class="celebration" id="celebration" aria-hidden="true"></div>
+</body>
+</html>
