@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="20×20 격자에서 사각형 안의 숫자 합이 10의 배수가 되도록 사과를 모으는 게임"
+    />
+    <title>사과 숫자 게임</title>
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="game">
+      <header class="game-header">
+        <p class="eyebrow">ONE-MINUTE CHALLENGE</p>
+        <h1><span aria-hidden="true">🍎</span> 사과 숫자 게임</h1>
+        <p class="subtitle">사과를 드래그해 사각형 안의 합을 10의 배수로 만들어 보세요!</p>
+      </header>
+
+      <section class="scoreboard" aria-label="게임 기록">
+        <div class="score-card">
+          <span class="score-label">현재 점수</span>
+          <strong id="score" aria-live="polite">0</strong>
+        </div>
+        <div class="score-card timer-card">
+          <span class="score-label">남은 시간</span>
+          <strong id="timer" role="timer" aria-live="off">01:00</strong>
+        </div>
+        <div class="score-card">
+          <span class="score-label">최고 점수</span>
+          <strong id="best-score">0</strong>
+        </div>
+      </section>
+
+      <section class="board-panel" aria-label="게임 보드">
+        <div class="board-topline">
+          <p id="game-message" class="game-message" aria-live="polite">
+            시작을 누르고 사과를 드래그해 사각형으로 선택하세요.
+          </p>
+          <p id="selection-total" class="selection-total" aria-live="polite"></p>
+        </div>
+        <div id="board-viewport" class="board-viewport">
+          <div
+            id="board"
+            class="board"
+            role="grid"
+            aria-label="20 곱하기 20 숫자 격자"
+            aria-describedby="game-message"
+          ></div>
+        </div>
+        <label class="board-scroll-control" for="board-scroll">
+          <span>작은 화면에서는 보드를 좌우로 이동할 수 있어요</span>
+          <input id="board-scroll" type="range" min="0" max="1" value="0" aria-label="보드 좌우 이동" />
+        </label>
+        <div class="board-footer">
+          <span><i class="legend-dot" aria-hidden="true"></i> 드래그한 사각형 안의 사과를 선택</span>
+          <span class="target-hint">합계가 10, 20, 30...이면 성공!</span>
+        </div>
+      </section>
+
+      <button id="start-button" class="start-button" type="button">게임 시작</button>
+      <p class="score-note">지운 숫자의 합만큼 점수를 얻어요.</p>
+    </main>
+    <div id="celebration" class="celebration" aria-hidden="true"></div>
+  </body>
+</html>
