@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3e8">
+  <title>사과나무 | 숫자 합치기</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Gowun+Batang:wght@400;700&family=Jua&display=swap');
+
+    :root {
+      color-scheme: light;
+      --paper: #f5f3e8;
+      --ink: #26362a;
+      --muted: #788274;
+      --leaf: #406a48;
+      --leaf-dark: #294c34;
+      --apple: #df5745;
+      --sun: #e7bd58;
+      --line: #dcded0;
+      --tile: #fffdf5;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      color: var(--ink);
+      background-color: var(--paper);
+      background-image: radial-gradient(#9ba58e25 .8px, transparent .8px);
+      background-size: 9px 9px;
+      font-family: 'Gowun Batang', Georgia, serif;
+    }
+
+    button { font: inherit; }
+
+    .page {
+      width: min(100% - 36px, 1000px);
+      margin: 0 auto;
+      padding: 30px 0 24px;
+    }
+
+    .topline {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 17px;
+      border-bottom: 1px solid var(--line);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0;
+      color: var(--muted);
+    }
+
+    .brand { color: var(--leaf-dark); font-weight: 500; }
+    .edition { text-transform: uppercase; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 270px;
+      gap: clamp(28px, 6vw, 76px);
+      align-items: center;
+      max-width: 840px;
+      margin: 42px auto 0;
+    }
+
+    .game-area { min-width: 0; }
+
+    .heading-row {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      color: var(--leaf-dark);
+      font-family: 'Jua', sans-serif;
+      font-size: clamp(27px, 4vw, 38px);
+      font-weight: 400;
+      line-height: 1.1;
+    }
+
+    .subtitle { margin: 7px 0 0; color: var(--muted); font-size: 13px; }
+
+    .target {
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      width: 54px;
+      height: 54px;
+      border: 1px solid #e5cc88;
+      border-radius: 50%;
+      color: #73591e;
+      background: #f5e9bf;
+      font-family: 'Jua', sans-serif;
+      font-size: 24px;
+    }
+
+    .board-wrap {
+      position: relative;
+      padding: 11px;
+      border: 1px solid #d8ddcc;
+      border-radius: 10px;
+      background: #e6eadc;
+      box-shadow: 0 5px 0 #d5dacb, 0 14px 32px #45533a12;
+      touch-action: none;
+      user-select: none;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: clamp(3px, .75vw, 7px);
+      aspect-ratio: 1;
+    }
+
+    .cell {
+      display: grid;
+      place-items: center;
+      min-width: 0;
+      padding: 0;
+      border: 1px solid #e6e3d5;
+      border-radius: 7px;
+      color: #354433;
+      background: var(--tile);
+      box-shadow: 0 2px 0 #d8d5c8;
+      font-family: 'Jua', sans-serif;
+      font-size: clamp(15px, 3vw, 25px);
+      cursor: crosshair;
+      transition: transform 100ms ease, background-color 100ms ease, color 100ms ease, box-shadow 100ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .cell:not(.empty):hover { transform: translateY(-2px); }
+    .cell.selected {
+      z-index: 1;
+      transform: translateY(-2px) scale(.96);
+      border-color: var(--leaf);
+      color: white;
+      background: var(--leaf);
+      box-shadow: 0 2px 0 var(--leaf-dark);
+    }
+    .cell.over { border-color: var(--apple); color: white; background: var(--apple); }
+    .cell.empty { border-color: transparent; background: #dce2d3; box-shadow: none; cursor: default; }
+    .fruit-count {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 4px;
+      font-family: sans-serif;
+      font-size: clamp(9px, 1.65vw, 15px);
+      line-height: 1;
+    }
+
+    .board-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      min-height: 26px;
+      padding: 9px 2px 0;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+    }
+
+    .sum { color: var(--leaf-dark); font-weight: 500; }
+    .sum.invalid { color: var(--apple); }
+
+    .side {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      padding-top: 18px;
+    }
+
+    .score-block { padding: 0 0 21px; border-bottom: 1px solid var(--line); }
+    .eyebrow {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+    .score {
+      color: var(--leaf-dark);
+      font-family: 'Jua', sans-serif;
+      font-size: 54px;
+      line-height: 1;
+      font-variant-numeric: tabular-nums;
+    }
+    .best-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-top: 13px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .best-value { color: var(--ink); font-family: 'DM Mono', monospace; font-size: 14px; }
+
+    .timer-block { padding: 19px 0 21px; }
+    .timer {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      color: var(--ink);
+      font-family: 'DM Mono', monospace;
+      font-size: 35px;
+      font-variant-numeric: tabular-nums;
+    }
+    .timer-icon { color: var(--apple); font-size: 18px; }
+    .timer.urgent { color: var(--apple); animation: tick 800ms ease-in-out infinite alternate; }
+    @keyframes tick { to { opacity: .62; } }
+
+    .button-row { display: grid; grid-template-columns: 1fr 42px; gap: 8px; }
+    .start-button, .sound-button {
+      min-height: 46px;
+      border: 0;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: transform 120ms ease, background 120ms ease;
+    }
+    .start-button {
+      color: white;
+      background: var(--leaf);
+      font-family: 'Jua', sans-serif;
+      font-size: 17px;
+    }
+    .start-button:hover { background: var(--leaf-dark); }
+    .start-button:active, .sound-button:active { transform: translateY(1px); }
+    .sound-button { border: 1px solid var(--line); color: var(--leaf-dark); background: #fbfaf2; font-size: 17px; }
+
+    .hint {
+      min-height: 46px;
+      margin: 13px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+    .hint strong { color: var(--leaf-dark); font-weight: 700; }
+
+    .toast {
+      position: fixed;
+      z-index: 4;
+      top: 20px;
+      left: 50%;
+      padding: 10px 16px;
+      border: 1px solid #e7d28f;
+      border-radius: 6px;
+      color: #604d1c;
+      background: #fbf0c9;
+      box-shadow: 0 5px 18px #26362a18;
+      font-size: 14px;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, -8px);
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+    .toast.show { opacity: 1; transform: translate(-50%, 0); }
+
+    .overlay {
+      position: absolute;
+      z-index: 2;
+      inset: 11px;
+      display: grid;
+      place-items: center;
+      border-radius: 6px;
+      background: #26362a99;
+      color: white;
+      text-align: center;
+      backdrop-filter: blur(2px);
+    }
+    .overlay[hidden] { display: none; }
+    .overlay-content { padding: 18px; }
+    .overlay-mark { margin-bottom: 8px; font-size: 30px; }
+    .overlay-title { font-family: 'Jua', sans-serif; font-size: 25px; }
+    .overlay-copy { margin: 7px 0 0; color: #f2f0e8; font-size: 13px; }
+
+    @media (max-width: 700px) {
+      .page { width: min(100% - 28px, 480px); padding-top: 19px; }
+      .layout { grid-template-columns: 1fr; gap: 20px; margin-top: 23px; }
+      .heading-row { margin-bottom: 13px; }
+      .board-wrap { padding: 8px; }
+      .board { gap: 4px; }
+      .cell { border-radius: 5px; font-size: clamp(15px, 5vw, 25px); }
+      .side { display: grid; grid-template-columns: 1fr 1fr; align-items: center; column-gap: 22px; padding-top: 0; }
+      .score-block { grid-row: span 2; padding: 0; border: 0; }
+      .score { font-size: 48px; }
+      .best-row { justify-content: flex-start; gap: 10px; padding-top: 10px; }
+      .timer-block { padding: 0 0 9px; }
+      .timer { font-size: 27px; }
+      .timer-icon { font-size: 15px; }
+      .button-row { grid-template-columns: 1fr 42px; }
+      .start-button, .sound-button { min-height: 42px; }
+      .hint { grid-column: 1 / -1; min-height: 0; margin-top: 4px; }
+    }
+
+    @media (max-width: 360px) {
+      .page { width: calc(100% - 20px); }
+      .board-wrap { padding: 6px; }
+      .board { gap: 3px; }
+      .cell { font-size: 16px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="topline">
+      <div class="brand">&#127822; SA-GWA / NO. 01</div>
+      <div class="edition">Orchard games &middot; 2026</div>
+    </header>
+
+    <section class="layout" aria-label="사과 합치기 게임">
+      <div class="game-area">
+        <div class="heading-row">
+          <div>
+            <h1>사과나무</h1>
+            <p class="subtitle">이웃한 칸을 이어 사과 10개를 모아 보세요.</p>
+          </div>
+          <div class="target" aria-label="목표 합계 10">10</div>
+        </div>
+
+        <div class="board-wrap">
+          <div class="board" id="board" role="grid" aria-label="6 곱하기 6 사과 격자"></div>
+          <div class="overlay" id="overlay">
+            <div class="overlay-content">
+              <div class="overlay-mark">&#127822;</div>
+              <div class="overlay-title" id="overlayTitle">나무를 흔들어 볼까요?</div>
+              <p class="overlay-copy" id="overlayCopy">시작을 누르면 2분 동안 열매를 모읍니다.</p>
+            </div>
+          </div>
+        </div>
+        <div class="board-footer">
+          <span>6 &times; 6 ORCHARD</span>
+          <span class="sum" id="sumLabel" aria-live="polite">합계 0 / 10</span>
+        </div>
+      </div>
+
+      <aside class="side" aria-label="게임 정보">
+        <div class="score-block">
+          <span class="eyebrow">Harvest score</span>
+          <div class="score" id="score" aria-live="polite">0</div>
+          <div class="best-row"><span>최고 점수</span><span class="best-value" id="best">0</span></div>
+        </div>
+        <div class="timer-block">
+          <span class="eyebrow">Time left</span>
+          <div class="timer" id="timer"><span class="timer-icon">&#9711;</span><span id="timeText">02:00</span></div>
+        </div>
+        <div class="button-row">
+          <button class="start-button" id="startButton" type="button">게임 시작</button>
+          <button class="sound-button" id="soundButton" type="button" aria-label="효과음 켜기" title="효과음 켜기">&#9834;</button>
+        </div>
+        <p class="hint" id="hint"><strong>드래그</strong>해서 상하좌우로 이웃한 칸을 잇고, 사과 10개를 수확하세요.</p>
+      </aside>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (() => {
+      const SIZE = 6;
+      const ROUND_SECONDS = 120;
+      const boardElement = document.getElementById('board');
+      const scoreElement = document.getElementById('score');
+      const bestElement = document.getElementById('best');
+      const timerElement = document.getElementById('timer');
+      const timeTextElement = document.getElementById('timeText');
+      const sumElement = document.getElementById('sumLabel');
+      const overlayElement = document.getElementById('overlay');
+      const overlayTitle = document.getElementById('overlayTitle');
+      const overlayCopy = document.getElementById('overlayCopy');
+      const startButton = document.getElementById('startButton');
+      const soundButton = document.getElementById('soundButton');
+      const toastElement = document.getElementById('toast');
+
+      let values = [];
+      let score = 0;
+      let best = loadBest();
+      let secondsLeft = ROUND_SECONDS;
+      let timerId = null;
+      let gameActive = false;
+      let pointerDown = false;
+      let selection = [];
+      let soundEnabled = false;
+      let audioContext = null;
+      let toastTimeout = null;
+
+      function loadBest() {
+        try { return Number(localStorage.getItem('sagwa-best-score')) || 0; }
+        catch { return 0; }
+      }
+
+      function saveBest() {
+        try { localStorage.setItem('sagwa-best-score', String(best)); }
+        catch { /* Storage may be unavailable in private browsing. */ }
+      }
+
+      function makeBoard() {
+        values = Array.from({ length: SIZE * SIZE }, () => 1 + Math.floor(Math.random() * 9));
+        boardElement.replaceChildren();
+        values.forEach((value, index) => {
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = 'cell';
+          cell.dataset.index = String(index);
+          cell.setAttribute('role', 'gridcell');
+          cell.setAttribute('aria-label', `행 ${Math.floor(index / SIZE) + 1}, 열 ${index % SIZE + 1}, 사과 ${value}개`);
+          const fruitCount = document.createElement('span');
+          fruitCount.className = 'fruit-count';
+          fruitCount.setAttribute('aria-hidden', 'true');
+          for (let fruit = 0; fruit < value; fruit += 1) {
+            fruitCount.append(document.createTextNode('🍎'));
+          }
+          cell.append(fruitCount);
+          boardElement.append(cell);
+        });
+      }
+
+      function renderScore() {
+        scoreElement.textContent = String(score);
+        bestElement.textContent = String(best);
+      }
+
+      function renderTimer() {
+        const minutes = Math.floor(secondsLeft / 60);
+        const seconds = secondsLeft % 60;
+        timeTextElement.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        timerElement.classList.toggle('urgent', secondsLeft <= 10 && gameActive);
+      }
+
+      function selectedTotal() {
+        return selection.reduce((total, index) => total + values[index], 0);
+      }
+
+      function updateSelection() {
+        const total = selectedTotal();
+        boardElement.querySelectorAll('.cell').forEach((cell) => {
+          const index = Number(cell.dataset.index);
+          cell.classList.toggle('selected', selection.includes(index));
+          cell.classList.toggle('over', selection.includes(index) && total > 10);
+        });
+        sumElement.textContent = `합계 ${total} / 10`;
+        sumElement.classList.toggle('invalid', total > 10);
+      }
+
+      function areNeighbors(first, second) {
+        const rowDistance = Math.abs(Math.floor(first / SIZE) - Math.floor(second / SIZE));
+        const columnDistance = Math.abs((first % SIZE) - (second % SIZE));
+        return rowDistance + columnDistance === 1;
+      }
+
+      function addToSelection(index) {
+        if (!gameActive || values[index] === 0 || selection.includes(index)) return;
+        if (selection.length && !areNeighbors(selection[selection.length - 1], index)) return;
+        selection.push(index);
+        updateSelection();
+        if (selectedTotal() > 10) {
+          selection = [];
+          updateSelection();
+          showToast('합이 10을 넘었어요. 다시 골라 보세요.');
+        }
+      }
+
+      function playTone(frequency, duration = .11) {
+        if (!soundEnabled) return;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return;
+        audioContext ||= new AudioContextClass();
+        if (audioContext.state === 'suspended') audioContext.resume();
+        const oscillator = audioContext.createOscillator();
+        const gain = audioContext.createGain();
+        oscillator.type = 'sine';
+        oscillator.frequency.value = frequency;
+        gain.gain.setValueAtTime(.08, audioContext.currentTime);
+        gain.gain.exponentialRampToValueAtTime(.001, audioContext.currentTime + duration);
+        oscillator.connect(gain);
+        gain.connect(audioContext.destination);
+        oscillator.start();
+        oscillator.stop(audioContext.currentTime + duration);
+      }
+
+      function finishSelection() {
+        if (!selection.length) return;
+        const total = selectedTotal();
+        if (total === 10) {
+          selection.forEach((index) => {
+            values[index] = 0;
+            const cell = boardElement.children[index];
+            cell.textContent = '';
+            cell.classList.remove('selected', 'over');
+            cell.classList.add('empty');
+            cell.setAttribute('aria-label', `행 ${Math.floor(index / SIZE) + 1}, 열 ${index % SIZE + 1}, 비어 있음`);
+            cell.disabled = true;
+          });
+          score += selection.length * 10;
+          if (score > best) {
+            best = score;
+            saveBest();
+          }
+          renderScore();
+          playTone(640, .16);
+          showToast(`${selection.length}개 수확! +${selection.length * 10}점`);
+        }
+        selection = [];
+        updateSelection();
+      }
+
+      function showToast(message) {
+        toastElement.textContent = message;
+        toastElement.classList.add('show');
+        clearTimeout(toastTimeout);
+        toastTimeout = setTimeout(() => toastElement.classList.remove('show'), 1400);
+      }
+
+      function endGame() {
+        gameActive = false;
+        pointerDown = false;
+        selection = [];
+        clearInterval(timerId);
+        timerId = null;
+        updateSelection();
+        renderTimer();
+        overlayTitle.textContent = '오늘의 수확 끝!';
+        overlayCopy.textContent = `이번 점수 ${score}점 · 다시 심고 한 판 더 해보세요.`;
+        overlayElement.hidden = false;
+        startButton.textContent = '다시 시작';
+      }
+
+      function startGame() {
+        clearInterval(timerId);
+        score = 0;
+        secondsLeft = ROUND_SECONDS;
+        gameActive = true;
+        selection = [];
+        makeBoard();
+        renderScore();
+        renderTimer();
+        updateSelection();
+        overlayElement.hidden = true;
+        startButton.textContent = '새 게임';
+        timerId = setInterval(() => {
+          secondsLeft -= 1;
+          renderTimer();
+          if (secondsLeft <= 0) endGame();
+        }, 1000);
+      }
+
+      boardElement.addEventListener('pointerdown', (event) => {
+        const cell = event.target.closest('.cell');
+        if (!cell || !gameActive || cell.classList.contains('empty')) return;
+        event.preventDefault();
+        pointerDown = true;
+        selection = [];
+        boardElement.setPointerCapture(event.pointerId);
+        addToSelection(Number(cell.dataset.index));
+      });
+
+      boardElement.addEventListener('pointermove', (event) => {
+        if (!pointerDown) return;
+        const cell = document.elementFromPoint(event.clientX, event.clientY)?.closest('.cell');
+        if (cell) addToSelection(Number(cell.dataset.index));
+      });
+
+      boardElement.addEventListener('pointerup', () => {
+        if (!pointerDown) return;
+        pointerDown = false;
+        finishSelection();
+      });
+
+      boardElement.addEventListener('pointercancel', () => {
+        pointerDown = false;
+        selection = [];
+        updateSelection();
+      });
+
+      boardElement.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') {
+          selection = [];
+          updateSelection();
+        }
+      });
+
+      startButton.addEventListener('click', startGame);
+      soundButton.addEventListener('click', () => {
+        soundEnabled = !soundEnabled;
+        soundButton.textContent = soundEnabled ? '\u266a' : '\u2669';
+        soundButton.setAttribute('aria-label', soundEnabled ? '효과음 끄기' : '효과음 켜기');
+        soundButton.title = soundEnabled ? '효과음 끄기' : '효과음 켜기';
+        if (soundEnabled) playTone(520);
+      });
+
+      makeBoard();
+      renderScore();
+      renderTimer();
+    })();
+  </script>
+</body>
+</html>
