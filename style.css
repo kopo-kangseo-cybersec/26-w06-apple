@@ -1,0 +1,125 @@
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  font-family: sans-serif;
+  background: #f4f1ea;
+  color: #333;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.game {
+  position: relative;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 16px;
+  text-align: center;
+}
+
+.status {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.status div {
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+  touch-action: none;
+}
+
+.cell {
+  aspect-ratio: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: bold;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+}
+
+.cell.empty { visibility: hidden; }
+.cell.selected { background: #ffd54f; border-color: #f9a825; }
+.cell.match { background: #81c784; border-color: #388e3c; }
+
+.apple-icon {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: clamp(2rem, 8vw, 3rem);
+  line-height: 1;
+  filter: drop-shadow(0 2px 1px rgba(80, 35, 20, 0.2));
+}
+
+.apple-value {
+  position: relative;
+  z-index: 1;
+  color: #fff;
+  text-shadow: 0 1px 3px #7b1b13, 1px 0 2px #7b1b13, -1px 0 2px #7b1b13;
+}
+
+.confetti {
+  position: fixed;
+  inset: 0;
+  z-index: 5;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.confetti-piece {
+  position: absolute;
+  top: -12px;
+  width: 9px;
+  height: 13px;
+  border-radius: 50% 50% 45% 45%;
+  animation: confetti-fall var(--duration) ease-in forwards;
+}
+
+@keyframes confetti-fall {
+  to {
+    top: 110vh;
+    transform: translateX(var(--drift)) rotate(720deg);
+    opacity: 0.2;
+  }
+}
+
+button {
+  margin-top: 12px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  border: 0;
+  border-radius: 8px;
+  background: #e53935;
+  color: #fff;
+  cursor: pointer;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.overlay.hidden { display: none; }
+
+.panel {
+  background: #fff;
+  padding: 24px 32px;
+  border-radius: 12px;
+}

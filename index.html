@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>10의 배수 게임</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game">
+    <h1>10의 배수 게임</h1>
+    <div class="status">
+      <div>점수 <strong id="score">0</strong></div>
+      <div>최고 점수 <strong id="best">0</strong></div>
+      <div>남은 시간 <strong id="time">60</strong>초</div>
+      <div>선택 합 <strong id="sum">0</strong></div>
+    </div>
+    <div id="board" class="board"></div>
+    <button id="restart" type="button">게임 시작</button>
+    <div id="confetti" class="confetti" aria-hidden="true"></div>
+    <div id="overlay" class="overlay hidden">
+      <div class="panel">
+        <h2>시간 종료!</h2>
+        <p>점수: <strong id="final-score">0</strong></p>
+        <p>최고 점수: <strong id="final-best">0</strong></p>
+        <button id="overlay-restart" type="button">다시 시작</button>
+      </div>
+    </div>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
