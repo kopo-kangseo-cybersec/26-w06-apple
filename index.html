@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff8ef">
+  <title>사과게임</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Pretendard", "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+      color: #34271f;
+      background: #fff8ef;
+      font-synthesis: none;
+      text-rendering: optimizeLegibility;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      min-width: 320px;
+      min-height: 100vh;
+      margin: 0;
+      padding: 32px 16px;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(ellipse at 10% 10%, #ffecd5 0, transparent 35%),
+        radial-gradient(ellipse at 90% 90%, #f8e4d2 0, transparent 32%),
+        #fff8ef;
+    }
+
+    button {
+      font: inherit;
+    }
+
+    .game {
+      width: min(100%, 470px);
+      padding: clamp(20px, 5vw, 32px);
+      border: 1px solid #f0dfcf;
+      border-radius: 28px;
+      background: rgb(255 255 255 / 88%);
+      box-shadow: 0 18px 55px rgb(91 55 27 / 10%);
+    }
+
+    .heading {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .eyebrow {
+      margin: 0 0 6px;
+      color: #bd6245;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 8vw, 2.7rem);
+      letter-spacing: -0.06em;
+    }
+
+    .subtitle {
+      margin: 9px 0 0;
+      color: #78695f;
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 9px;
+      margin-bottom: 16px;
+    }
+
+    .stat {
+      padding: 12px 8px;
+      border-radius: 16px;
+      background: #fff5e9;
+      text-align: center;
+    }
+
+    .stat-label {
+      display: block;
+      margin-bottom: 4px;
+      color: #8c796b;
+      font-size: 0.72rem;
+      font-weight: 700;
+    }
+
+    .stat-value {
+      display: block;
+      font-size: clamp(1.1rem, 5vw, 1.45rem);
+      font-variant-numeric: tabular-nums;
+      font-weight: 800;
+    }
+
+    #timer.warning {
+      color: #c54032;
+    }
+
+    .board {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: clamp(5px, 1.8vw, 9px);
+      padding: clamp(8px, 2vw, 12px);
+      border: 1px solid #f2dfcc;
+      border-radius: 21px;
+      background: #fffaf4;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .apple {
+      display: grid;
+      aspect-ratio: 1;
+      place-items: center;
+      padding: 0;
+      border: 2px solid transparent;
+      border-radius: 14px;
+      background: #ffefdc;
+      cursor: crosshair;
+      font-size: clamp(1.55rem, 7.7vw, 2.35rem);
+      line-height: 1;
+      transition: transform 100ms ease, background-color 100ms ease, border-color 100ms ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .apple:hover {
+      transform: translateY(-2px);
+      background: #ffe5c8;
+    }
+
+    .apple:focus-visible,
+    .start-button:focus-visible {
+      outline: 3px solid #cc7658;
+      outline-offset: 3px;
+    }
+
+    .apple.selected {
+      transform: scale(0.94);
+      border-color: #dc7955;
+      background: #ffcfad;
+      box-shadow: 0 0 0 2px rgb(220 121 85 / 16%);
+    }
+
+    .apple.matched {
+      transform: scale(0.82);
+      background: #dff0d6;
+    }
+
+    .apple:disabled {
+      cursor: default;
+    }
+
+    .message {
+      min-height: 26px;
+      margin: 13px 0 8px;
+      color: #78695f;
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .message.success {
+      color: #34804b;
+    }
+
+    .message.invalid {
+      color: #c54032;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      margin-top: 8px;
+    }
+
+    .start-button {
+      min-width: 160px;
+      padding: 13px 24px;
+      border: 0;
+      border-radius: 999px;
+      background: #c9563d;
+      color: white;
+      cursor: pointer;
+      font-weight: 800;
+      transition: background-color 120ms ease, transform 120ms ease;
+    }
+
+    .start-button:hover {
+      transform: translateY(-1px);
+      background: #ad432f;
+    }
+
+    .start-button:active {
+      transform: translateY(0);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="game">
+    <header class="heading">
+      <p class="eyebrow">Apple match</p>
+      <h1>🍎 사과게임</h1>
+      <p class="subtitle">사과를 이어 드래그해 합계 10을 만들어 보세요.<br>대각선으로도 이을 수 있어요!</p>
+    </header>
+
+    <section class="stats" aria-label="게임 기록">
+      <div class="stat">
+        <span class="stat-label">남은 시간</span>
+        <span class="stat-value" id="timer" aria-live="off">02:00</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">현재 점수</span>
+        <span class="stat-value" id="score" aria-live="polite">0</span>
+      </div>
+      <div class="stat">
+        <span class="stat-label">최고 점수</span>
+        <span class="stat-value" id="best-score">0</span>
+      </div>
+    </section>
+
+    <div class="board" id="board" role="grid" aria-label="사과 게임판"></div>
+    <p class="message" id="message" role="status" aria-live="polite">게임 시작을 눌러 도전해 보세요!</p>
+    <div class="controls">
+      <button class="start-button" id="start-button" type="button">게임 시작</button>
+    </div>
+  </main>
+
+  <script>
+    (() => {
+      const GRID_SIZE = 6;
+      const TARGET_SUM = 10;
+      const GAME_LENGTH_SECONDS = 120;
+      const BEST_SCORE_KEY = "apple-game-best-score";
+
+      const board = document.querySelector("#board");
+      const timerDisplay = document.querySelector("#timer");
+      const scoreDisplay = document.querySelector("#score");
+      const bestScoreDisplay = document.querySelector("#best-score");
+      const message = document.querySelector("#message");
+      const startButton = document.querySelector("#start-button");
+
+      let cells = [];
+      let selectedCells = [];
+      let selectedSum = 0;
+      let score = 0;
+      let bestScore = loadBestScore();
+      let secondsLeft = GAME_LENGTH_SECONDS;
+      let timerId = null;
+      let activePointerId = null;
+      let gameActive = false;
+      let invalidDrag = false;
+      let resolving = false;
+
+      function loadBestScore() {
+        try {
+          const storedScore = Number(localStorage.getItem(BEST_SCORE_KEY));
+          return Number.isFinite(storedScore) && storedScore >= 0 ? storedScore : 0;
+        } catch (error) {
+          console.warn("최고 점수를 불러오지 못했습니다.", error);
+          return 0;
+        }
+      }
+
+      function saveBestScore() {
+        try {
+          localStorage.setItem(BEST_SCORE_KEY, String(bestScore));
+        } catch (error) {
+          console.warn("최고 점수를 저장하지 못했습니다.", error);
+        }
+      }
+
+      function randomValue() {
+        return Math.floor(Math.random() * 9) + 1;
+      }
+
+      function renderBoard() {
+        board.replaceChildren();
+        cells.forEach((value, index) => {
+          const row = Math.floor(index / GRID_SIZE);
+          const column = index % GRID_SIZE;
+          const apple = document.createElement("button");
+          apple.type = "button";
+          apple.className = "apple";
+          apple.textContent = "🍎";
+          apple.dataset.index = String(index);
+          apple.dataset.value = String(value);
+          apple.setAttribute("role", "gridcell");
+          apple.setAttribute("aria-label", `${row + 1}행 ${column + 1}열 사과`);
+          apple.disabled = !gameActive || resolving;
+          board.append(apple);
+        });
+      }
+
+      function setMessage(text, kind = "") {
+        message.textContent = text;
+        message.className = `message${kind ? ` ${kind}` : ""}`;
+      }
+
+      function updateTimerDisplay() {
+        const minutes = Math.floor(secondsLeft / 60);
+        const seconds = secondsLeft % 60;
+        timerDisplay.textContent = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+        timerDisplay.classList.toggle("warning", secondsLeft <= 10);
+      }
+
+      function clearSelection() {
+        selectedCells.forEach((index) => {
+          const cell = board.querySelector(`[data-index="${index}"]`);
+          if (cell) cell.classList.remove("selected");
+        });
+        selectedCells = [];
+        selectedSum = 0;
+      }
+
+      function areAdjacent(firstIndex, secondIndex) {
+        const rowDistance = Math.abs(Math.floor(firstIndex / GRID_SIZE) - Math.floor(secondIndex / GRID_SIZE));
+        const columnDistance = Math.abs((firstIndex % GRID_SIZE) - (secondIndex % GRID_SIZE));
+        return Math.max(rowDistance, columnDistance) === 1;
+      }
+
+      function invalidateSelection() {
+        clearSelection();
+        invalidDrag = true;
+        setMessage("합이 10을 넘었어요. 선택이 취소됐습니다.", "invalid");
+      }
+
+      function selectCell(index) {
+        if (invalidDrag || resolving || selectedCells.includes(index)) return;
+        if (selectedCells.length > 0 && !areAdjacent(selectedCells[selectedCells.length - 1], index)) return;
+
+        selectedSum += cells[index];
+        if (selectedSum > TARGET_SUM) {
+          invalidateSelection();
+          return;
+        }
+
+        selectedCells.push(index);
+        board.querySelector(`[data-index="${index}"]`).classList.add("selected");
+        setMessage(`선택한 사과 ${selectedCells.length}개 · 합계 ${selectedSum} / ${TARGET_SUM}`);
+      }
+
+      function completeSelection() {
+        if (selectedSum !== TARGET_SUM || selectedCells.length === 0) {
+          clearSelection();
+          setMessage("합계가 10이 되도록 사과를 이어 보세요.");
+          return;
+        }
+
+        const matchedCells = [...selectedCells];
+        matchedCells.forEach((index) => {
+          const cell = board.querySelector(`[data-index="${index}"]`);
+          cell.classList.remove("selected");
+          cell.classList.add("matched");
+        });
+
+        score += TARGET_SUM;
+        scoreDisplay.textContent = String(score);
+        if (score > bestScore) {
+          bestScore = score;
+          bestScoreDisplay.textContent = String(bestScore);
+          saveBestScore();
+        }
+
+        selectedCells = [];
+        selectedSum = 0;
+        resolving = true;
+        startButton.disabled = true;
+        setMessage(`합계 10! ${TARGET_SUM}점을 얻었어요.`, "success");
+
+        window.setTimeout(() => {
+          matchedCells.forEach((index) => {
+            cells[index] = randomValue();
+          });
+          resolving = false;
+          startButton.disabled = false;
+          renderBoard();
+        }, 180);
+      }
+
+      function cellAtPoint(x, y) {
+        const element = document.elementFromPoint(x, y);
+        const cell = element && element.closest(".apple");
+        return cell && board.contains(cell) ? Number(cell.dataset.index) : null;
+      }
+
+      function finishDrag() {
+        activePointerId = null;
+        if (invalidDrag) {
+          invalidDrag = false;
+          return;
+        }
+        completeSelection();
+      }
+
+      function endGame() {
+        gameActive = false;
+        window.clearInterval(timerId);
+        timerId = null;
+        activePointerId = null;
+        clearSelection();
+        renderBoard();
+        startButton.textContent = "다시 하기";
+        setMessage(`시간 종료! 최종 점수는 ${score}점입니다.`);
+      }
+
+      function startGame() {
+        window.clearInterval(timerId);
+        cells = Array.from({ length: GRID_SIZE * GRID_SIZE }, randomValue);
+        selectedCells = [];
+        selectedSum = 0;
+        score = 0;
+        secondsLeft = GAME_LENGTH_SECONDS;
+        activePointerId = null;
+        invalidDrag = false;
+        resolving = false;
+        gameActive = true;
+        startButton.disabled = false;
+        scoreDisplay.textContent = "0";
+        bestScoreDisplay.textContent = String(bestScore);
+        updateTimerDisplay();
+        renderBoard();
+        startButton.textContent = "다시 시작";
+        setMessage("인접한 사과를 드래그해 합계 10을 만드세요.");
+
+        timerId = window.setInterval(() => {
+          secondsLeft -= 1;
+          updateTimerDisplay();
+          if (secondsLeft <= 0) endGame();
+        }, 1000);
+      }
+
+      board.addEventListener("pointerdown", (event) => {
+        const cell = event.target.closest(".apple");
+        if (!cell || !gameActive || resolving || event.button !== 0) return;
+        event.preventDefault();
+        activePointerId = event.pointerId;
+        invalidDrag = false;
+        clearSelection();
+        selectCell(Number(cell.dataset.index));
+      });
+
+      window.addEventListener("pointermove", (event) => {
+        if (event.pointerId !== activePointerId || invalidDrag) return;
+        const index = cellAtPoint(event.clientX, event.clientY);
+        if (index !== null) selectCell(index);
+      });
+
+      window.addEventListener("pointerup", (event) => {
+        if (event.pointerId === activePointerId) finishDrag();
+      });
+
+      window.addEventListener("pointercancel", (event) => {
+        if (event.pointerId !== activePointerId) return;
+        activePointerId = null;
+        invalidDrag = false;
+        clearSelection();
+        setMessage("선택이 취소됐습니다.");
+      });
+
+      startButton.addEventListener("click", startGame);
+      bestScoreDisplay.textContent = String(bestScore);
+      updateTimerDisplay();
+      renderBoard();
+    })();
+  </script>
+</body>
+</html>
