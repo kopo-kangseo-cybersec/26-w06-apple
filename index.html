@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f0df">
+    <title>사과 + APPLE 게임</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <main class="game-shell">
+      <header class="masthead">
+        <p class="eyebrow">ORCHARD PUZZLE · 01</p>
+        <h1>사과 <span>+ APPLE 게임</span></h1>
+        <p class="intro">숫자를 이어 합을 만들고, 바구니를 채워보세요.</p>
+      </header>
+
+      <section class="scoreboard" aria-label="게임 정보">
+        <div class="score-item score-current">
+          <span class="score-label">현재 점수</span>
+          <strong id="score">0</strong>
+        </div>
+        <div class="score-item score-best">
+          <span class="score-label">최고 점수</span>
+          <strong id="best-score">0</strong>
+        </div>
+        <div class="score-item score-time" id="timer-panel">
+          <span class="score-label">남은 시간</span>
+          <strong><span id="timer">60</span><small>초</small></strong>
+        </div>
+      </section>
+
+      <section class="play-area" aria-label="숫자 게임">
+        <div class="board-heading">
+          <div>
+            <p class="board-kicker">오늘의 수확</p>
+            <h2>숫자 바구니</h2>
+          </div>
+          <p class="selection-total" aria-live="polite">선택 합 <strong id="selection-sum">0</strong></p>
+        </div>
+
+        <div class="board-frame">
+          <div id="board" class="board" role="grid" aria-label="사과 모양 8행 8열 숫자 보드"></div>
+        </div>
+
+        <div class="game-footer">
+          <p id="game-message" class="game-message" aria-live="polite">시작을 누르고 숫자를 이어보세요.</p>
+          <div class="game-actions">
+            <button id="start-button" class="start-button" type="button">
+              <span class="button-mark" aria-hidden="true">↗</span>
+              <span>게임 시작</span>
+            </button>
+            <button id="refresh-button" class="refresh-button" type="button" aria-label="숫자판 새로고침" title="숫자판 새로고침" disabled>
+              <span aria-hidden="true">↻</span>
+            </button>
+            <button id="stop-button" class="stop-button" type="button" disabled>
+              <span class="button-mark" aria-hidden="true">■</span>
+              <span>중지</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footnote">
+        <span>8 × 8</span><span>1—9</span><span>10의 배수</span><span>60초</span>
+      </footer>
+    </main>
+  </body>
+</html>
